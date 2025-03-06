@@ -1,1 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loading Screen</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        font-family: 'Arial', sans-serif;
+        overflow: hidden;
+      }
 
+      .loading-container {
+        position: relative;
+        width: 300px;
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo {
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 30px;
+        position: relative;
+        letter-spacing: 2px;
+        background: linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335);
+        background-size: 300% 100%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientShift 5s linear infinite;
+      }
+
+      .progress-container {
+        width: 100%;
+        height: 4px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .progress-bar {
+        position: absolute;
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #4285f4, #34a853, #fbbc05, #ea4335);
+        background-size: 300% 100%;
+        animation: gradientShift 5s linear infinite;
+        /* progressAnim will be set via JavaScript */
+      }
+
+      @keyframes gradientShift {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .particles {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
+      .particle {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background-color: rgba(66, 133, 244, 0.7);
+        border-radius: 50%;
+      }
+
+      .glow {
+        position: absolute;
+        width: 100%;
+        height: 4px;
+        background: rgba(66, 133, 244, 0.5);
+        filter: blur(10px);
+        border-radius: 10px;
+      }
+
+      .hexagon {
+        position: absolute;
+        width: 20px;
+        height: 11.5px;
+        background-color: rgba(66, 133, 244, 0.1);
+        border-radius: 2px;
+        opacity: 0;
+      }
+
+      .hexagon:before,
+      .hexagon:after {
+        content: '';
+        position: absolute;
+        width: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+      }
+
+      .hexagon:before {
+        bottom: 100%;
+        border-bottom: 5.8px solid rgba(66, 133, 244, 0.1);
+      }
+
+      .hexagon:after {
+        top: 100%;
+        border-top: 5.8px solid rgba(66, 133, 244, 0.1);
+      }
+
+      @keyframes hexagonFade {
+        0% {
+          transform: rotate(0deg) scale(0.8);
+          opacity: 0;
+        }
+        20% {
+          opacity: 0.3;
+        }
+        80% {
+          opacity: 0.3;
+        }
+        100% {
+          transform: rotate(360deg) scale(1.2);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading-container">
+      <div class="logo" id="logo">Max</div>
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+        <div class="glow"></div>
+      </div>
+      <div class="particles" id="particles"></div>
+    </div>
+
+    <script>
+      // 控制加载速度的变量（单位：毫秒）
+      // 较小的值 = 更快的加载，较大的值 = 更慢的加载
+      const loadingSpeed = 5000;
+
+      // 设置进度条动画
+      const progressBar = document.getElementById('progress-bar');
+      progressBar.style.animation = `gradientShift 5s linear infinite, progressAnim ${loadingSpeed}ms ease-out forwards`;
+
+      // 添加进度条动画关键帧
+      const styleSheet = document.createElement('style');
+      document.head.appendChild(styleSheet);
+
+      const progressAnimRule = `
+        @keyframes progressAnim {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+    `;
+
+      if (styleSheet.sheet) {
+        styleSheet.sheet.insertRule(
+          progressAnimRule,
+          styleSheet.sheet.cssRules.length
+        );
+      }
+
+      // Create particles
+      const particlesContainer = document.getElementById('particles');
+      const particleCount = 30;
+
+      // Create particles
+      for (let i = 0; i < particleCount; i++) {
+        createParticle();
+      }
+
+      // Create hexagons
+      for (let i = 0; i < 15; i++) {
+        createHexagon();
+      }
+
+      function createParticle() {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
+
+        const size = Math.random() * 3 + 1;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+
+        const x = Math.random() * 300;
+        const y = Math.random() * 200;
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+
+        const duration = Math.random() * 2 + 1;
+        const animName = `fadeInOut${Math.floor(Math.random() * 10000)}`;
+
+        const startX = Math.random() * 20 - 10;
+        const startY = Math.random() * 20 - 10;
+        const endX = Math.random() * 20 - 10;
+        const endY = Math.random() * 20 - 10;
+
+        const rule = `
+            @keyframes ${animName} {
+                0% {
+                    transform: translate(${startX}px, ${startY}px);
+                    opacity: ${Math.random() * 0.5 + 0.3};
+                }
+                100% {
+                    transform: translate(${endX}px, ${endY}px);
+                    opacity: ${Math.random() * 0.5 + 0.3};
+                }
+            }
+        `;
+
+        if (styleSheet.sheet) {
+          styleSheet.sheet.insertRule(rule, styleSheet.sheet.cssRules.length);
+        }
+
+        particle.style.animation = `${animName} ${duration}s infinite alternate`;
+        particlesContainer.appendChild(particle);
+      }
+
+      function createHexagon() {
+        const hexagon = document.createElement('div');
+        hexagon.classList.add('hexagon');
+
+        const size = Math.random() * 15 + 10;
+        hexagon.style.width = `${size}px`;
+        hexagon.style.height = `${size * 0.577}px`;
+
+        const x = Math.random() * 300;
+        const y = Math.random() * 200;
+        hexagon.style.left = `${x}px`;
+        hexagon.style.top = `${y}px`;
+
+        const delay = Math.random() * 3;
+        const duration = Math.random() * 3 + 2;
+
+        hexagon.style.animation = `hexagonFade ${duration}s ${delay}s infinite`;
+        particlesContainer.appendChild(hexagon);
+      }
+
+      // 使用加载速度变量来控制加载完成的时间
+      setTimeout(() => {
+        // 这里可以添加加载完成后的操作
+        console.log('Loading complete');
+      }, loadingSpeed);
+    </script>
+  </body>
+</html>
